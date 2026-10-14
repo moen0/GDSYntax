@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '1.17.4'
+    id 'org.jetbrains.grammarkit' version '2023.3.0.4'
+}
+
+group = 'com.godot.gdscript'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+intellij {
+    version = '2023.2.5'
+    type = 'IC'
+    plugins = []
+}
+
+grammarKit {
+    jflexRelease = '1.9.1'
+}
+
+sourceSets {
+    main {
+        java.srcDirs += ['src/main/gen']
+    }
+}
+
+generateLexer {
+    sourceFile = file('src/main/jflex/_GDScriptLexer.flex')
+    targetOutputDir = file('src/main/gen/com/godot/gdscript/lexer')
+    targetClass = '_GDScriptLexer'
+    purgeOldFiles = true
+}
+
+tasks.named('compileJava') {
+    dependsOn 'generateLexer'
+}
+
+tasks.named('instrumentCode') {
+    enabled = false
+}
+
+tasks.named('instrumentTestCode') {
+    enabled = false
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+patchPluginXml {
+    sinceBuild = '232'
+    untilBuild = ''
+}
